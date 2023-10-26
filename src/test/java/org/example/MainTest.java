@@ -4,27 +4,28 @@ import java.util.*;
 import static org.junit.Assert.*;
 import org.junit.Test;
 import org.junit.Before;
+import org.mockito.Mockito;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 
 public class MainTest {
 
+    @InjectMocks
     private Cart cart;
+
+    @Mock
     private List<Product> availableProducts;
 
     @Before
     public void setUp() {
-        cart = new Cart();
-        availableProducts = new ArrayList<>();
-        availableProducts.add(new Product(1, "Телефон Xiaomi", 8000));
-        availableProducts.add(new Product(2, "Ноутбук Lenovo", 20000));
-        availableProducts.add(new Product(3, "Планшет Notepad", 10000));
-        availableProducts.add(new Product(4, "Комп'ютер Samsung", 700));
-        availableProducts.add(new Product(5, "Консоль PlayStation", 15000));
-        availableProducts.add(new Product(6, "Телевізор LG", 20000));
+        MockitoAnnotations.initMocks(this);
     }
 
     @Test
     public void testAddProductToCart() {
-        Product productToAdd = availableProducts.get(0);
+        Product productToAdd = new Product(1, "Телефон Xiaomi", 8000);
+        Mockito.when(availableProducts.get(0)).thenReturn(productToAdd);
         cart.addProduct(productToAdd);
         Map<Integer, Integer> productsInCart = cart.getProductsInCart();
         assertEquals(1, productsInCart.size());
@@ -32,7 +33,8 @@ public class MainTest {
 
     @Test
     public void testRemoveProductFromCart() {
-        Product productToAdd = availableProducts.get(0);
+        Product productToAdd = new Product(2, "Ноутбук Lenovo", 20000);
+        Mockito.when(availableProducts.get(0)).thenReturn(productToAdd);
         cart.addProduct(productToAdd);
         cart.removeProduct(productToAdd);
         Map<Integer, Integer> productsInCart = cart.getProductsInCart();
@@ -41,7 +43,8 @@ public class MainTest {
 
     @Test
     public void testPlaceOrder() {
-        Product productToAdd = availableProducts.get(0);
+        Product productToAdd = new Product(3, "Планшет Notepad", 10000);
+        Mockito.when(availableProducts.get(0)).thenReturn(productToAdd);
         cart.addProduct(productToAdd);
         List<Product> productsInCart = new ArrayList<>();
         productsInCart.add(productToAdd);
@@ -54,15 +57,19 @@ public class MainTest {
 
     @Test
     public void testGetOrderStatus() {
-        Product productToAdd = availableProducts.get(0);
+        Product productToAdd = new Product(4, "Комп'ютер Samsung", 700);
+        Mockito.when(availableProducts.get(0)).thenReturn(productToAdd);
         cart.addProduct(productToAdd);
         List<Product> productsInCart = new ArrayList<>();
         productsInCart.add(productToAdd);
         Order order = new Order(productsInCart);
         List<Order> orders = new ArrayList<>();
         orders.add(order);
+
         Order retrievedOrder = orders.get(0);
-        retrievedOrder.setStatus("Processing");
-        assertEquals("Processing", retrievedOrder.getStatus());
+        Order spyOrder = Mockito.spy(retrievedOrder);
+        spyOrder.setStatus("Processing");
+
+        assertEquals("Processing", spyOrder.getStatus());
     }
 }
